@@ -29,10 +29,10 @@ class CreateNotesTable extends Migration
             $table->integer('user_id')->unsigned();
 
             // Relationships
-            $table->foregin('label_id')
+            $table->foreign('label_id')
                 ->references('id')
                 ->on('labels');
-            $table->foregin('user_id')
+            $table->foreign('user_id')
                 ->references('id')
                 ->on('users');
 

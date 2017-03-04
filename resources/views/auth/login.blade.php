@@ -1,9 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container">
+<div class="container unauth">
     <div class="row">
-        <div class="col-md-8 col-md-offset-2">
+        <div class="col m6 offset-m3 s12">
             <div class="panel panel-default">
                 <div class="panel-heading">Login</div>
                 <div class="panel-body">
@@ -39,23 +39,13 @@
                         </div>
 
                         <div class="form-group">
-                            <div class="col-md-6 col-md-offset-4">
-                                <div class="checkbox">
-                                    <label>
-                                        <input type="checkbox" name="remember" {{ old('remember') ? 'checked' : '' }}> Remember Me
-                                    </label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <div class="col-md-8 col-md-offset-4">
-                                <button type="submit" class="btn btn-primary">
+                            <div class="col m12 s12">
+                                <button type="submit" class="btn btn-primary yellow darken-3 col m3 s12">
                                     Login
                                 </button>
 
-                                <a class="btn btn-link" href="{{ route('password.request') }}">
-                                    Forgot Your Password?
+                                <a class="btn btn-link yellow darken-3 col m8 s12 offset-m1" href="{{ route('password.request') }}">
+                                    Forgot Password?
                                 </a>
                             </div>
                         </div>
