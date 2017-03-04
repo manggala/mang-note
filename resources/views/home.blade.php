@@ -145,6 +145,7 @@
 <script type="text/javascript">
     $('.dropdown-button').dropdown();
     $(document).ready(function(){
+        // Notes Append
         var placeholders = $('.note-placeholder');
         var shortestNote = placeholders.first();
         placeholders.each(function(){
@@ -153,6 +154,20 @@
                 shortestNote = $(this);
         })
         shortestNote.append($('#note-template').clone().removeAttr('id').show());
+
+        // Modal AJAX call
+        $('.modal-trigger').click(function(){
+            var trigger = $(this);
+            $.get(trigger.attr('target-url')).done(function(response){
+                $(trigger.attr('href') + "_loader").hide();
+                $(trigger.attr('href') + "_content").html(response);
+            }).fail(function(response){
+                $(trigger.attr('href') + "_loader").hide();
+                $(trigger.attr('href') + "_content").html(
+                    "ERROR. you are trying to access <a href='" + trigger.attr('target-url') + "'> " + trigger.attr('target-url') + "</a> that currently not available. Try again later."
+                );
+            });
+        });
     });
 </script>
 @endsection

@@ -80,7 +80,7 @@
     </a>
     <ul>
         <li>
-            <a href="#basicModal" class="modal-trigger btn-floating tooltipped yellow" data-position="bottom" data-delay="50" data-tooltip="Add Label">
+            <a href="#basicModal" class="modal-trigger btn-floating tooltipped yellow" data-position="bottom" data-delay="50" data-tooltip="Add Label" target-url="{{route('label.create')}}">
                 <i class="material-icons">turned_in_not</i>
             </a>
         </li>
