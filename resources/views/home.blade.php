@@ -29,7 +29,7 @@
         font-size: .9rem;
     }
 
-    .panel .panel-footer span{
+    .panel .panel-footer span.label{
         color: #999;
         font-style: normal;
     }
@@ -41,28 +41,24 @@
 @section('content')
 <div class="panel panel-default" style="display: none" id="note-template">
     <div class="panel-heading">
-        Your top priority!
+        <span id="note_template_title">
+            Your top priority!
+        </span>
         <a class='dropdown-button right' href='#' data-activates='dropdown1'><i class="material-icons">reorder</i></a>
     </div>
 
-    <div class="panel-body">
+    <div class="panel-body" id="note_template_content">
         This top priority is right here, 
     </div>
     <div class="panel-footer">
         <div class="panel-meta">
-            <span>Deadline: </span> 23 February 2017 23:59
+            <span class="label">Deadline: </span> <span id="note_template_deadline">23 February 2017 23:59</span>
         </div>
         <div class="panel-meta">
-            <span>Label: </span> Top Priority
+            <span class="label">Label: </span> <span id="note_template_priority">Top Priority</span>
         </div>
     </div>
 </div>
-<ul id='dropdown1' class='dropdown-content'>
-    <li><a href="#!">Edit</a></li>
-    <li><a href="#!">Mark as Done</a></li>
-    <li class="divider"></li>
-    <li><a href="#!" class="disabled">Delete</a></li>
-</ul>
 <div class="container">
     <div class="row">
         <div class="col m12 s12">
@@ -76,67 +72,13 @@
     </div>
     <div class="row">
         <div class="col m4 s12 note-placeholder">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    Your top priority!
-                    <a class='dropdown-button right' href='#' data-activates='dropdown1'><i class="material-icons">reorder</i></a>
-                </div>
-
-                <div class="panel-body">
-                    This top priority is right here, 
-                </div>
-                <div class="panel-footer">
-                    <div class="panel-meta">
-                        <span>Deadline: </span> 23 February 2017 23:59
-                    </div>
-                    <div class="panel-meta">
-                        <span>Label: </span> Top Priority
-                    </div>
-                </div>
-            </div>
+            
         </div>
         <div class="col m4 s12 note-placeholder">
-            <div class="panel panel-default done">
-                <div class="panel-heading">
-                    Medium priority?
-                    <a class='dropdown-button right' href='#' data-activates='dropdown1'><i class="material-icons">reorder</i></a>
-                </div>
-
-                <div class="panel-body">
-                    Nevermind, you have this priority
-                </div>
-                <div class="panel-footer">
-                    <div class="panel-meta">
-                        <span>Deadline: </span> 23 February 2017 23:59
-                    </div>
-                    <div class="panel-meta">
-                        <span>Label: </span> Top Priority
-                    </div>
-                    <div class="panel-meta">
-                        <span>Status: </span> <b>Done</b>
-                    </div>
-                </div>
-            </div>
+            
         </div>
         <div class="col m4 s12 note-placeholder">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    Low Priority, aint no body got time for this
-                    <a class='dropdown-button right' href='#' data-activates='dropdown1'><i class="material-icons">reorder</i></a>
-                </div>
-
-                <div class="panel-body">
-                    Im not working on this priority :)
-                </div>
-                <div class="panel-footer">
-                    <div class="panel-meta">
-                        <span>Deadline: </span> 23 February 2017 23:59
-                    </div>
-                    <div class="panel-meta">
-                        <span>Label: </span> Top Priority
-                    </div>
-                </div>
-            </div>
+            
         </div>
     </div>
 </div>
@@ -144,16 +86,46 @@
 @section('custom-footer')
 <script type="text/javascript">
     $('.dropdown-button').dropdown();
-    $(document).ready(function(){
-        // Notes Append
+    // Notes Append
+    function appendNotes(data){
         var placeholders = $('.note-placeholder');
         var shortestNote = placeholders.first();
         placeholders.each(function(){
-            console.log($(this));
             if (shortestNote.outerHeight() > $(this).outerHeight())
                 shortestNote = $(this);
         })
+        setTemplateData(data);
         shortestNote.append($('#note-template').clone().removeAttr('id').show());
+        resetNoteTemplate();
+    }
+
+    // Setting All value from json
+    function setTemplateData(data){
+        $('#note_template_title').text(data.title);
+        $('#note_template_content').text(data.content);
+        $('#note_template_deadline').text(data.deadline);
+        $('#note_template_priority').text(data.label_id);
+        if (data.is_done == 1)
+            $('#note-template').addClass('done');
+    }
+
+    // Reset all content of note template
+    function resetNoteTemplate(){
+        $('#note_template_title').text();
+        $('#note_template_content').text();
+        $('#note_template_deadline').text();
+        $('#note_template_priority').text();
+        $('#note-template').removeClass('done');
+    }
+    $(document).ready(function(){
+        // Get Recent Notes
+        $.get('{{url("rest/note")}}').done(function(response){
+            for (var i = 0; i < response.data.length; i++){
+                appendNotes(response.data[i]);
+            }
+        }).fail(function(){
+
+        });
 
         // Modal AJAX call
         $('.modal-trigger').click(function(){

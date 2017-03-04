@@ -24,4 +24,5 @@ Route::group(['middleware' => ['auth']], function(){
 
 	Route::resource('/note', 'NoteController');
 
+	Route::get('/rest/note', 'HomeController@restNote');
 });
