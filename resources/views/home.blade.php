@@ -158,14 +158,22 @@
         // Modal AJAX call
         $('.modal-trigger').click(function(){
             var trigger = $(this);
+
+            // Show ajax preloader
+            $(trigger.attr('href') + '_loader').show();
+            $(trigger.attr('href') + '_content').hide();
+            console.log(trigger.attr('target-url'));
+            // If server response, do following
             $.get(trigger.attr('target-url')).done(function(response){
+                // If success, do following
                 $(trigger.attr('href') + "_loader").hide();
-                $(trigger.attr('href') + "_content").html(response);
+                $(trigger.attr('href') + "_content").html(response).show();
             }).fail(function(response){
+                // If error, do following
                 $(trigger.attr('href') + "_loader").hide();
                 $(trigger.attr('href') + "_content").html(
                     "ERROR. you are trying to access <a href='" + trigger.attr('target-url') + "'> " + trigger.attr('target-url') + "</a> that currently not available. Try again later."
-                );
+                ).show();
             });
         });
     });

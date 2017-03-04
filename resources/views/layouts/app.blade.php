@@ -85,7 +85,7 @@
             </a>
         </li>
         <li>
-              <a href="#basicModal" class="modal-trigger btn-floating tooltipped orange" data-position="bottom" data-delay="50" data-tooltip="Add Notes">
+              <a href="#basicModal" class="modal-trigger btn-floating tooltipped orange" data-position="bottom" data-delay="50" data-tooltip="Add Notes" target-url="{{route('note.create')}}">
                 <i class="material-icons">assignment</i>
             </a>
         </li>
