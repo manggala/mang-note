@@ -74,23 +74,6 @@
 
         @yield('content')
     </div>
-    <div class="fixed-action-btn">
-    <a class="btn-floating btn-large red">
-    <i class="large material-icons">add</i>
-    </a>
-    <ul>
-        <li>
-            <a href="#basicModal" class="modal-trigger btn-floating tooltipped yellow" data-position="bottom" data-delay="50" data-tooltip="Add Label" target-url="{{route('label.create')}}">
-                <i class="material-icons">turned_in_not</i>
-            </a>
-        </li>
-        <li>
-              <a href="#basicModal" class="modal-trigger btn-floating tooltipped orange" data-position="bottom" data-delay="50" data-tooltip="Add Notes" target-url="{{route('note.create')}}">
-                <i class="material-icons">assignment</i>
-            </a>
-        </li>
-    </ul>
-    </div>
     @include('layouts.modals')
     <!-- Scripts -->
     <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>

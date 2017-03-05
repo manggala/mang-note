@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Auth;
+
+use App\Label;
 use App\Note;
 class HomeController extends Controller
 {
@@ -23,11 +26,12 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        $data['labels'] = Label::where('user_id', Auth::user()->id)->get();
+        return view('home', compact('data'));
     }
 
     public function restNote(){
-        $data['notes'] = Note::orderBy('deadline', 'desc')->paginate(6);
+        $data['notes'] = Note::orderBy('deadline', 'asc')->get();
         return response($data['notes']);
     }
 }

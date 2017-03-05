@@ -36,26 +36,34 @@
     .dropdown-button{
         color: #999;
     }
+    span.filter{
+        margin-right: 15px;
+    }
+    hr{
+        background-color: rgb(235,235,235) !important;
+        height: 2px !important;
+        border: none;
+        margin-bottom: 15px;
+        margin-top: -15px;
+    }
 </style>
 @endsection
 @section('content')
 <div class="panel panel-default" style="display: none" id="note-template">
     <div class="panel-heading">
         <span id="note_template_title">
-            Your top priority!
         </span>
         <a class='dropdown-button right' href='#' data-activates='dropdown1'><i class="material-icons">reorder</i></a>
     </div>
 
     <div class="panel-body" id="note_template_content">
-        This top priority is right here, 
     </div>
     <div class="panel-footer">
         <div class="panel-meta">
-            <span class="label">Deadline: </span> <span id="note_template_deadline">23 February 2017 23:59</span>
+            <span class="label">Deadline: </span> <span id="note_template_deadline"></span>
         </div>
         <div class="panel-meta">
-            <span class="label">Label: </span> <span id="note_template_priority">Top Priority</span>
+            <span class="label">Label: </span> <span id="note_template_priority"></span>
         </div>
     </div>
 </div>
@@ -63,14 +71,75 @@
     <div class="row">
         <div class="col m12 s12">
             <div class="panel panel-default">
-                <div class="panel-heading">Welcome!</div>
+                <div class="panel-heading">Advance </div>
                 <div class="panel-body">
-                    Thanks for chosing this Mang-Notes
+                    <div class="row">
+                        <div class="col m8 s12">
+                            <div class="row">
+                                <div class="col m3 s12">
+                                    Label Filter:
+                                </div>
+                                <div class="col m9 s12">
+                                    @foreach($data['labels'] as $label)
+                                    <span class="filter">
+                                        <input type="checkbox" class="label" label_id="{{$label->id}}" label_title="{{$label->title}}" id="label_{{$label->id}}" checked/>
+                                        <label for="label_{{$label->id}}">{{$label->title}}</label>
+                                    </span>
+                                    @endforeach
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col m3 s12">
+                                    Mark Filter:
+                                </div>
+                                <div class="col m9 s12">
+                                    <span class="filter">
+                                        <input type="checkbox" id="mark_done" checked/>
+                                        <label for="mark_done">Done</label>
+                                    </span>
+                                    <span>
+                                        <input type="checkbox" id="mark_undone" checked/>
+                                        <label for="mark_undone">Undone</label>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col m4 s12">
+                            <label>Sort by</label>
+                            <select class="browser-default" id="sorting">
+                                <option value="" disabled selected>chose sorting</option>
+                                <option value="label">Label Name</option>
+                                <option value="title">Title</option>
+                                <option value="description">Description</option>
+                                <option value="deadline">Deadline</option>
+                            </select> 
+                        </div>
+                    </div>
+                    
+
                 </div>
             </div>
         </div>
     </div>
-    <div class="row">
+    <hr>
+    <div class="row" id="notes_preloader">
+        <center>
+            <div class="preloader-wrapper big active">
+                <div class="spinner-layer spinner-blue-only">
+                    <div class="circle-clipper left">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="gap-patch">
+                        <div class="circle"></div>
+                    </div>
+                    <div class="circle-clipper right">
+                        <div class="circle"></div>
+                    </div>
+                </div>
+            </div>
+        </center>
+    </div>
+    <div class="row" id="notes_container">
         <div class="col m4 s12 note-placeholder">
             
         </div>
@@ -82,13 +151,38 @@
         </div>
     </div>
 </div>
+<div class="fixed-action-btn">
+    <a class="btn-floating btn-large red">
+        <i class="large material-icons">add</i>
+    </a>
+    <ul>
+        <li>
+            <a href="#basicModal" class="modal-trigger btn-floating tooltipped yellow" data-position="bottom" data-delay="50" data-tooltip="Add Label" target-url="{{route('label.create')}}">
+                <i class="material-icons">turned_in_not</i>
+            </a>
+        </li>
+        <li>
+              <a href="#basicModal" class="modal-trigger btn-floating tooltipped orange" data-position="bottom" data-delay="50" data-tooltip="Add Notes" target-url="{{route('note.create')}}">
+                <i class="material-icons">assignment</i>
+            </a>
+        </li>
+    </ul>
+</div>
 @endsection
 @section('custom-footer')
 <script type="text/javascript">
     $('.dropdown-button').dropdown();
+    var notes = [];
+    var placeholders = $('.note-placeholder');
+    function clearNotes(){
+        $('#notes_preloader').show();
+        $('#notes_container').hide();
+        placeholders.each(function(){
+            $(this).empty();
+        });
+    }
     // Notes Append
     function appendNotes(data){
-        var placeholders = $('.note-placeholder');
         var shortestNote = placeholders.first();
         placeholders.each(function(){
             if (shortestNote.outerHeight() > $(this).outerHeight())
@@ -117,12 +211,32 @@
         $('#note_template_priority').text();
         $('#note-template').removeClass('done');
     }
+
+    function arrangeNotes(data){
+        clearNotes();
+        $('#notes_preloader').hide();
+        $('#notes_container').show();
+        for (var i = 0; i < data.length; i++){
+            appendNotes(data[i]);
+        }
+    }
+
+    function filterNotes(data, labels){
+        var filteredNotes = [];
+        for (var i = 0; i < data.length; i++){
+            console.log(data, labels);
+            if (labels.indexOf(data[i].label_id) >= 0)
+                filteredNotes.push(data[i]);
+        }
+        return filteredNotes;
+    }
     $(document).ready(function(){
         // Get Recent Notes
         $.get('{{url("rest/note")}}').done(function(response){
-            for (var i = 0; i < response.data.length; i++){
-                appendNotes(response.data[i]);
+            for (var i = 0; i < response.length; i++){
+                notes.push(response[i]);
             }
+            arrangeNotes(notes);
         }).fail(function(){
 
         });
@@ -148,6 +262,42 @@
                 ).show();
             });
         });
+
+        // Sorting triggers
+        $('#sorting').change(function(){
+            switch($(this).val()){
+                case 'label':
+                    // Do something
+                    console.log('lbl')
+                    break;
+                case 'title':
+                    console.log('ttl')
+                    // Do something
+                    break;
+                case 'description':
+                    console.log('dsc')
+                    // Do something
+                    break;
+                case 'deadline':
+                    console.log('ddl')
+                    // Do something
+                    break;
+                
+            }
+        });
+
+        // Filter Triggers
+        $('.label').click(function(){
+            var checkedLabels = [];
+            $('.label').each(function(){
+                if ($(this).prop('checked'))
+                    checkedLabels.push(parseInt($(this).attr('label_id')));
+            });
+            var filteredNotes = filterNotes(notes, checkedLabels);
+            clearNotes();
+            arrangeNotes(filteredNotes);
+            resetNoteTemplate();
+        })
     });
 </script>
 @endsection
