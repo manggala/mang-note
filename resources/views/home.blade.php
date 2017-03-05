@@ -108,15 +108,21 @@
                             <label>Sort by</label>
                             <select class="browser-default" id="sorting">
                                 <option value="" disabled selected>chose sorting</option>
-                                <option value="label">Label Name</option>
+                                <option value="label_id">Label Name</option>
                                 <option value="title">Title</option>
-                                <option value="description">Description</option>
+                                <option value="content">Description</option>
                                 <option value="deadline">Deadline</option>
                             </select> 
+                            <p>
+                                <input name="sorting_method" type="radio" id="asc" value="asc" checked />
+                                <label for="asc">Ascending (A-Z, 0-9)</label>
+                            </p>
+                            <p>
+                                <input name="sorting_method" type="radio" id="desc" value="desc" />
+                                <label for="desc">Descending (Z-A, 9-0)</label>
+                            </p>
                         </div>
                     </div>
-                    
-
                 </div>
             </div>
         </div>
@@ -224,7 +230,6 @@
     function filterNotes(data, labels, anchor){
         var filteredNotes = [];
         for (var i = 0; i < data.length; i++){
-            console.log(labels, data[i][anchor]);
             if (labels.indexOf(data[i][anchor]) >= 0)
                 filteredNotes.push(data[i]);
         }
@@ -246,9 +251,19 @@
                 checkedLabels.push(parseInt($(this).attr('mark_code')));
         });
         var filteredNotes = filterNotes(filteredNotes, checkedLabels, 'is_done');
-        clearNotes();
-        arrangeNotes(filteredNotes);
-        resetNoteTemplate();
+        return filteredNotes;
+    }
+
+    //function sorting
+    function sortAct(data, method, sortby){
+        var slicedData = data.slice(0);
+        console.log(method);
+        return slicedData.sort(function(a, b){
+            if (method == 'asc')
+                return a[sortby] < b[sortby] ? -1 : a[sortby] > b[sortby] ? 1 : 0;
+            else 
+                return a[sortby] > b[sortby] ? -1 : a[sortby] < b[sortby] ? 1 : 0;
+        });
     }
     $(document).ready(function(){
         // Get Recent Notes
@@ -268,7 +283,6 @@
             // Show ajax preloader
             $(trigger.attr('href') + '_loader').show();
             $(trigger.attr('href') + '_content').hide();
-            console.log(trigger.attr('target-url'));
             // If server response, do following
             $.get(trigger.attr('target-url')).done(function(response){
                 // If success, do following
@@ -285,36 +299,28 @@
 
         // Sorting triggers
         $('#sorting').change(function(){
-            switch($(this).val()){
-                case 'label':
-                    // Do something
-                    console.log('lbl')
-                    break;
-                case 'title':
-                    console.log('ttl')
-                    // Do something
-                    break;
-                case 'description':
-                    console.log('dsc')
-                    // Do something
-                    break;
-                case 'deadline':
-                    console.log('ddl')
-                    // Do something
-                    break;
-                
-            }
+            var filteredNotes = filterAllNotes(notes);
+            var sortedNotes = sortAct(filteredNotes, $('input[name="sorting_method"]:checked').val(), $(this).val());
+            console.log(sortedNotes);
+            arrangeNotes(sortedNotes);
+            resetNoteTemplate();
         });
 
         // Filter Triggers
         $('.label').click(function(){
-            filterAllNotes(notes);
+            var filteredNotes = filterAllNotes(notes);
+            clearNotes();
+            arrangeNotes(filteredNotes);
+            resetNoteTemplate();
         });
 
         // Marking Status Triggers
         $('.marking').click(function(){
-            filterAllNotes(notes);
-        }) 
+            var filteredNotes = filterAllNotes(notes);
+            clearNotes();
+            arrangeNotes(filteredNotes);
+            resetNoteTemplate();
+        });
     });
 </script>
 @endsection
