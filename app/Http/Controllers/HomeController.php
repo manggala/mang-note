@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Auth;
-
+use DateTime;
 use App\Label;
 use App\Note;
 class HomeController extends Controller
@@ -61,5 +61,26 @@ class HomeController extends Controller
             $notes->save();
             return response(['status' => 'success', 'message' => 'Note not found', 'action' => 'mark']);
         }
+    }
+
+    public function getUpcomingNotes(){
+        $start_date = new DateTime(date('Y-m-d H:i:s'));
+        $stop_date = new DateTime(date('Y-m-d H:i:s'));
+        $stop_date->modify('+1 day');
+        $notes = Note::where('user_id', Auth::user()->id)
+            ->where('is_done', 0)
+            ->where('is_alerted', 0)
+            ->whereBetween('deadline', [$start_date, $stop_date])
+            ->get();
+        return response($notes);
+    }
+
+    public function gotThis($id){
+        $note = Note::where('user_id', Auth::user()->id)->find($id);
+        if (empty($note))
+            return response(['status' => 'not found'], 404);
+        $note->is_alerted = 1;
+        $note->save();
+        return response(['status' => 'read']);
     }
 }

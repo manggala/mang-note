@@ -71,7 +71,6 @@
                 </ul>
             </div>
         </nav>
-
         @yield('content')
     </div>
     @include('layouts.modals')

@@ -27,4 +27,8 @@ Route::group(['middleware' => ['auth']], function(){
 	Route::get('/rest/note', 'HomeController@restNote');
 
 	Route::get('/mark-this/{id}', 'HomeController@markThis');
+
+	Route::get('/rest/upcoming-note', 'HomeController@getUpcomingNotes');
+
+	Route::get('/rest/got-this-note/{id}', 'HomeController@gotThis');
 });

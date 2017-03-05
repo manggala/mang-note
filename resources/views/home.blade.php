@@ -75,6 +75,23 @@
     </div>
 </div>
 <div class="container">
+<div class="fixed-action-btn horizontal click-to-toggle" id="notification_pane" style="top: 72px; display: none">
+    <a class="btn-floating btn-large red darken-2">
+      <i class="material-icons">error_outline</i>
+    </a>
+    <ul>
+        <li>
+            <ul style="margin-right: -75px" id="notification_placeholder">
+                <li id="notification_template">
+                    <div class="panel btn-floating black-text white" style="padding: 15px;margin: 0px; width: 100%; height: 100%">
+                        <p>Your <b id="notification_template_title">This Tasks!</b> deadline is at <b id="notification_template_deadline">2017-03-10 23:59</b></p>
+                        <button class="btn green" onclick="gotThis(this)" id="notification_template_button">Got it</button>
+                    </div>
+                </li>
+            </ul>
+        </li>
+    </ul>
+  </div>
     <div class="row">
         <div class="col m12 s12">
             <div class="panel panel-default">
@@ -165,7 +182,7 @@
     </div>
 </div>
 <div class="fixed-action-btn">
-    <a class="btn-floating btn-large red">
+    <a class="btn-floating btn-large yellow darken-3">
         <i class="large material-icons">add</i>
     </a>
     <ul>
@@ -358,5 +375,46 @@
             resetNoteTemplate();
         });
     });
+    setInterval(function(){
+        $.get('{{ url("rest/upcoming-note") }}').done(function(response){
+            if (response.length > 0){
+                for (var i = 0; i < response.length; i++){
+                    if ($('li[note_id="' + response[i].id + '"]').length){
+                    } else {
+                        $('#notification_template').show();
+                        $('#notification_template_title').text(response[i].title);
+                        $('#notification_template_deadline').text(response[i].deadline);
+                        $('#notification_template_button').attr('note_id', response[i].id);
+                        $('#notification_template').attr('note_id', response[i].id);
+                        $('#notification_placeholder').append($('#notification_template').clone().removeAttr('id'));
+                        $('#notification_template').hide();
+                    }
+                }
+                $('#notification_pane').show();
+            }
+        }).fail(function(response){
+
+        })
+    }, -10000);
+    function gotThis(target){
+        console.log('haha');
+        target = $(target);
+        $.get('{{ url("/rest/got-this-note") }}/' + target.attr('note_id')).done(function(response){
+            if (response.status == 'read')
+                $('li[note_id="' + target.attr('note_id') + '"]').remove();
+            hideAlert();
+        }).fail(function(){
+
+        });
+    }
+    function hideAlert(){
+        var notifications = 0;
+        $('#notification_placeholder').children().each(function(){
+            if ($(this).attr('id') != 'notification_template')
+                notifications ++;
+        })
+        if (notifications <= 0)
+            $('#notification_pane').hide();
+    }
 </script>
 @endsection
