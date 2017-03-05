@@ -211,7 +211,7 @@
         $('#note_template_title').text(data.title);
         $('#note_template_content').text(data.content);
         $('#note_template_deadline').text(data.deadline);
-        $('#note_template_priority').text(data.label_id);
+        $('#note_template_priority').text(data.label_title);
         $('#markingButton').attr('note_id', data.id);
         $('#note-template').attr('note_id', data.id);
         if (data.is_done == 1)
