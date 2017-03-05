@@ -94,11 +94,11 @@
                                 </div>
                                 <div class="col m9 s12">
                                     <span class="filter">
-                                        <input type="checkbox" id="mark_done" checked/>
+                                        <input type="checkbox" mark_code="1" class="marking" id="mark_done" checked/>
                                         <label for="mark_done">Done</label>
                                     </span>
                                     <span>
-                                        <input type="checkbox" id="mark_undone" checked/>
+                                        <input type="checkbox" mark_code="0" class="marking" id="mark_undone" checked/>
                                         <label for="mark_undone">Undone</label>
                                     </span>
                                 </div>
@@ -220,15 +220,35 @@
             appendNotes(data[i]);
         }
     }
-
-    function filterNotes(data, labels){
+    // Filter Notes
+    function filterNotes(data, labels, anchor){
         var filteredNotes = [];
         for (var i = 0; i < data.length; i++){
-            console.log(data, labels);
-            if (labels.indexOf(data[i].label_id) >= 0)
+            console.log(labels, data[i][anchor]);
+            if (labels.indexOf(data[i][anchor]) >= 0)
                 filteredNotes.push(data[i]);
         }
         return filteredNotes;
+    }
+
+    // Filtering
+    function filterAllNotes(data){
+        var checkedLabels = [];
+        $('.label').each(function(){
+            if ($(this).prop('checked'))
+                checkedLabels.push(parseInt($(this).attr('label_id')));
+        });
+        var filteredNotes = filterNotes(data, checkedLabels, 'label_id');
+        
+        var checkedLabels = [];
+        $('.marking').each(function(){
+            if ($(this).prop('checked'))
+                checkedLabels.push(parseInt($(this).attr('mark_code')));
+        });
+        var filteredNotes = filterNotes(filteredNotes, checkedLabels, 'is_done');
+        clearNotes();
+        arrangeNotes(filteredNotes);
+        resetNoteTemplate();
     }
     $(document).ready(function(){
         // Get Recent Notes
@@ -288,16 +308,13 @@
 
         // Filter Triggers
         $('.label').click(function(){
-            var checkedLabels = [];
-            $('.label').each(function(){
-                if ($(this).prop('checked'))
-                    checkedLabels.push(parseInt($(this).attr('label_id')));
-            });
-            var filteredNotes = filterNotes(notes, checkedLabels);
-            clearNotes();
-            arrangeNotes(filteredNotes);
-            resetNoteTemplate();
-        })
+            filterAllNotes(notes);
+        });
+
+        // Marking Status Triggers
+        $('.marking').click(function(){
+            filterAllNotes(notes);
+        }) 
     });
 </script>
 @endsection
