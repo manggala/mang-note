@@ -276,7 +276,6 @@
                 return a[sortby] > b[sortby] ? -1 : a[sortby] < b[sortby] ? 1 : 0;
         });
     }
-
     function markThis(target){
         $.get('{{ url("/mark-this") }}/' + $(target).attr('note_id') ).done(function(response){
             if (response.status == 'success'){
@@ -284,6 +283,10 @@
                     $('.panel[note_id="' + $(target).attr('note_id') + '"').addClass('done');
                 else 
                     $('.panel[note_id="' + $(target).attr('note_id') + '"').removeClass('done');
+                for (var i = 0; i < notes.length; i++){
+                    if (notes[i].id == $(target).attr('note_id'))
+                        notes[i].is_done = response.action == 'mark' ? 1 : 0;
+                }
             }
         }).fail(function(response){
             console.log(response);

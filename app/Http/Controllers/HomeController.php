@@ -32,7 +32,20 @@ class HomeController extends Controller
 
     public function restNote(){
         $data['notes'] = Note::orderBy('deadline', 'asc')->get();
-        return response($data['notes']);
+        $data['newNotes'] = [];
+        foreach ($data['notes'] as $note) {
+            array_push($data['newNotes'], [
+                'id' => $note->id,
+                'title' => $note->title,
+                'content' => $note->content,
+                'deadline' => $note->deadline,
+                'is_done' => $note->is_done,
+                'is_alerted' => $note->is_alerted,
+                'label_id' => $note->label_id,
+                'label_title' => isset($note->label->title) ? $note->label->title : 'No Label'
+            ]);
+        }
+        return response($data['newNotes']);
     }
 
     public function markThis($id){
