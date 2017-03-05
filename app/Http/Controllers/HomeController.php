@@ -39,8 +39,8 @@ class HomeController extends Controller
                 'title' => $note->title,
                 'content' => $note->content,
                 'deadline' => $note->deadline,
-                'is_done' => $note->is_done,
-                'is_alerted' => $note->is_alerted,
+                'is_done' => $note->is_done == true ? 1 : 0,
+                'is_alerted' => $note->is_alerted == true ? 1 : 0,
                 'label_id' => $note->label_id,
                 'label_title' => isset($note->label->title) ? $note->label->title : 'No Label'
             ]);
