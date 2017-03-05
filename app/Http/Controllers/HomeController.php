@@ -34,4 +34,19 @@ class HomeController extends Controller
         $data['notes'] = Note::orderBy('deadline', 'asc')->get();
         return response($data['notes']);
     }
+
+    public function markThis($id){
+        $notes = Note::where('user_id', Auth::user()->id)->find($id);
+        if (empty($notes))
+            return response(['status' => 'failed', 'message' => 'Note not found'], 404);
+        if ($notes->is_done == 1){
+            $notes->is_done = 0;
+            $notes->save();
+            return response(['status' => 'success', 'message' => 'Note not found', 'action' => 'unmark']);
+        } else {
+            $notes->is_done = 1;
+            $notes->save();
+            return response(['status' => 'success', 'message' => 'Note not found', 'action' => 'mark']);
+        }
+    }
 }

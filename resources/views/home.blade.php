@@ -46,6 +46,13 @@
         margin-bottom: 15px;
         margin-top: -15px;
     }
+    button.no-btn{
+        border: none;
+        background-color: rgba(0,0,0,0);
+    }
+    .panel.done div button.no-btn i{
+        color: green;
+    }
 </style>
 @endsection
 @section('content')
@@ -53,7 +60,7 @@
     <div class="panel-heading">
         <span id="note_template_title">
         </span>
-        <a class='dropdown-button right' href='#' data-activates='dropdown1'><i class="material-icons">reorder</i></a>
+        <button class='dropdown-button right no-btn' href='#' id="markingButton" onclick="markThis(this)"><i class="material-icons">done</i></button>
     </div>
 
     <div class="panel-body" id="note_template_content">
@@ -108,7 +115,7 @@
                             <label>Sort by</label>
                             <select class="browser-default" id="sorting">
                                 <option value="" disabled selected>chose sorting</option>
-                                <option value="label_id">Label Name</option>
+                                <option value="label_id">Label</option>
                                 <option value="title">Title</option>
                                 <option value="content">Description</option>
                                 <option value="deadline">Deadline</option>
@@ -205,6 +212,8 @@
         $('#note_template_content').text(data.content);
         $('#note_template_deadline').text(data.deadline);
         $('#note_template_priority').text(data.label_id);
+        $('#markingButton').attr('note_id', data.id);
+        $('#note-template').attr('note_id', data.id);
         if (data.is_done == 1)
             $('#note-template').addClass('done');
     }
@@ -216,6 +225,8 @@
         $('#note_template_deadline').text();
         $('#note_template_priority').text();
         $('#note-template').removeClass('done');
+        $('#note-template').removeAttr('note_id');
+        $('#markingButton').removeAttr('note_id');
     }
 
     function arrangeNotes(data){
@@ -265,6 +276,19 @@
                 return a[sortby] > b[sortby] ? -1 : a[sortby] < b[sortby] ? 1 : 0;
         });
     }
+
+    function markThis(target){
+        $.get('{{ url("/mark-this") }}/' + $(target).attr('note_id') ).done(function(response){
+            if (response.status == 'success'){
+                if (response.action == 'mark')
+                    $('.panel[note_id="' + $(target).attr('note_id') + '"').addClass('done');
+                else 
+                    $('.panel[note_id="' + $(target).attr('note_id') + '"').removeClass('done');
+            }
+        }).fail(function(response){
+            console.log(response);
+        })
+    }
     $(document).ready(function(){
         // Get Recent Notes
         $.get('{{url("rest/note")}}').done(function(response){
@@ -295,6 +319,15 @@
                     "ERROR. you are trying to access <a href='" + trigger.attr('target-url') + "'> " + trigger.attr('target-url') + "</a> that currently not available. Try again later."
                 ).show();
             });
+        });
+
+        // Sorting method triggers
+        $('input[type="radio"]').click(function(){
+            var filteredNotes = filterAllNotes(notes);
+            var sortedNotes = sortAct(filteredNotes, $('input[name="sorting_method"]:checked').val(), $('#sorting').val());
+            console.log(sortedNotes);
+            arrangeNotes(sortedNotes);
+            resetNoteTemplate();
         });
 
         // Sorting triggers
