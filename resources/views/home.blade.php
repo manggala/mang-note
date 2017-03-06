@@ -395,7 +395,7 @@
         }).fail(function(response){
 
         })
-    }, -10000);
+    }, 10000);
     function gotThis(target){
         console.log('haha');
         target = $(target);

@@ -13,6 +13,10 @@ class NoteController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function __construct(){
+        date_default_timezone_set('Asia/Jakarta');
+    }
+
     public function index()
     {
         //
