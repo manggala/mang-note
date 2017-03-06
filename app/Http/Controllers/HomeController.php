@@ -32,14 +32,16 @@ class HomeController extends Controller
     }
 
     public function restNote(){
-        $data['notes'] = Note::where('user_id', Auth::user()->id)->orderBy('deadline', 'asc')->get();
+        $data['notes'] = Note::where('user_id', Auth::user()->id)
+            ->orderBy('deadline', 'asc')
+            ->get();
         $data['newNotes'] = [];
         foreach ($data['notes'] as $note) {
             array_push($data['newNotes'], [
                 'id' => $note->id,
                 'title' => $note->title,
                 'content' => $note->content,
-                'deadline' => $note->deadline,user
+                'deadline' => $note->deadline,
                 'is_done' => $note->is_done == true ? 1 : 0,
                 'is_alerted' => $note->is_alerted == true ? 1 : 0,
                 'label_id' => $note->label_id,
